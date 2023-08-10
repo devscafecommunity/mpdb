@@ -8,6 +8,7 @@ const client = new Client({
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMembers,
         GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent
     ],
     partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
     allowedMentions: {
@@ -33,27 +34,51 @@ const { Routes } = require('discord-api-types/v9');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
 module.exports = {
-    data: new SlashCommandBuilder()
-        .setName('ping')
-        .setDescription('Replies with pong!'),
+    name: 'buy',
+    description: 'Open the shop.',
     async execute(interaction) {
-        await interaction.reply('Pong!');
-    }
-};
+
+    },
+    options: [
+        {
+            name: 'item',
+            description: 'Item to buy',
+            type: 3,
+            required: true
+        }
+    ]
+}
 */ 
 const fs = require('fs');
 const commands = [];
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-for(const file of commandFiles) {
+for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
-    commands.push(command.data.toJSON());
+    commands.push(command);
 }
-console.log(commands);
 
-// Load events
+// Command handler
+client.on('interactionCreate', async Interaction => {
+    if (!Interaction.isCommand()) return;
+    const { commandName } = Interaction;
+    
+    for (const command of commands) {
+        if (command.name === commandName) {
+            try {
+                await command.execute(Interaction);
+            } catch (error) {
+                console.error(error);
+                await Interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+            }
+        }
+    }
+});
+
+// Event handler
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
-for(const file of eventFiles) {
+for (const file of eventFiles) {
     const event = require(`./events/${file}`);
+
     if(event.once) {
         client.once(event.name, (...args) => event.execute(...args, client));
     } else {
@@ -61,22 +86,29 @@ for(const file of eventFiles) {
     }
 }
 
-// // Load slash commands
-// const rest = new REST({ version: '9' }).setToken(process.env.DISCORD_TOKEN);
-// (async () => {
-//     try {
-//         console.log('Started refreshing application (/) commands.');
 
-//         await rest.put(
-//             Routes.applicationGuildCommands(process.env.DISCORD_CLIENT_ID, process.env.DISCORD_GUILD_ID),
-//             { body: commands }
-//         );
+// Load slash commands
+const CLIENT_ID = process.env.CLIENT_ID;
+const TOKEN = process.env.TOKEN;
+const rest = new REST({ version: '9' }).setToken(TOKEN);
 
-//         console.log('Successfully reloaded application (/) commands.');
-//     } catch (error) {
-//         console.error(error);
-//     }
-// })();
+async function main(){
+    try {
+        console.log('Started refreshing application (/) commands.');
 
-// Login
-client.login(process.env.DISCORD_TOKEN);
+        await rest.put(
+            Routes.applicationCommands(CLIENT_ID),
+            {
+                body: commands,
+            }
+        );
+
+        console.log('Successfully reloaded application (/) commands.');
+
+        client.login(TOKEN);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+main();

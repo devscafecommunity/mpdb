@@ -1,11 +1,15 @@
-// Ping command
-const { SlashCommandBuilder } = require('@discordjs/builders');
-
 module.exports = {
-    data: new SlashCommandBuilder()
-        .setName('ping')
-        .setDescription('Replies with pong!'),
+    name: 'ping',
+    description: 'Ping...',
     async execute(interaction) {
         await interaction.reply('Pong!');
-    }
-};
+    },
+    options: [
+        {
+            name: 'item',
+            description: 'Item to buy',
+            type: 3,
+            required: true
+        }
+    ]
+}
