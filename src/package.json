@@ -1,0 +1,14 @@
+{
+  "name": "mpdb",
+  "version": "1.0.0",
+  "description": "Multi Prupose discord bot.",
+  "main": "index.js",
+  "repository": "https://github.com/devscafecommunity/mpdb.git",
+  "author": "Pedro Kaleb! <73436445+LyeZinho@users.noreply.github.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@discordjs/rest": "^2.0.0",
+    "discord.js": "^14.12.1",
+    "dotenv": "^16.3.1"
+  }
+}
