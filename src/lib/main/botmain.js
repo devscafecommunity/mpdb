@@ -27,31 +27,13 @@ async function main(){
 main();
 */ 
 
-function main(
-    restInstance,
-    routesInstance,
-    clientId,
-    token,
-    clientInstance,
-    commands,
-){
+async function main( restInstance, routesInstance, clientId, token, clientInstance, commands ){
     try {
-        console.log('Started aplication (/) commands cache.');
-
-        restInstance.put(routesInstance.applicationCommands(clientId), { body: [] })
-            .then(() => console.log('Successfully deleted all application commands.'))
-            .catch(console.error);
-
         console.log('Started refreshing application (/) commands.');
 
-        restInstance.put(
-            routesInstance.applicationCommands(clientId),
-            {
-                body: commands,
-            }
-        );
-
-        console.log('Successfully reloaded application (/) commands.');
+        await restInstance.put( routesInstance.applicationCommands(clientId), { body: commands })
+            .then(() => console.log('Successfully reloaded application (/) commands.'))
+            .catch(console.error);
 
         clientInstance.login(token);
     } catch (error) {

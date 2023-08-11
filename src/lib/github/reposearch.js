@@ -101,4 +101,11 @@ async function reposearch(queryTerm){
     return returnData;
 }
 
+// Test
+// const fs = require('fs');
+// reposearch('discord.js').then((data) => {
+//     fs.writeFileSync('./test.json', JSON.stringify(data, null, 2));
+// });
+    
+
 module.exports = reposearch;
