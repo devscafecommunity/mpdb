@@ -7,6 +7,7 @@
 
 
 const http = require('http');
+const express = require('express');
 const socketIO = require('socket.io');
 const botMain = require('./botmain.js');
 const { emit } = require('process');
@@ -54,7 +55,9 @@ class BotServer {
     constructor(internalCommands, botInstance) {
         this.botInstance = botInstance;
         this.internalCommands = internalCommands;
-        this.server = http.createServer();
+        // this.server = http.createServer();
+        this.app = express();
+        this.server = http.createServer(this.app);
         this.io = socketIO(this.server);
 
         this.setupSocketEvents();
@@ -62,17 +65,54 @@ class BotServer {
     }
 
     setupSocketEvents() {
+        // this.io.on('connection', (socket) => {
+        //     for (const command of this.internalCommands) {
+        //         // Client will emmit: "servercommand" as the event 
+        //         // and the command name as the data
+        //         socket.on('servercommand', (data) => {
+        //             if (data === command.name) {
+        //                 command.execute(this);
+        //             }
+        //         });
+        //     }
+        // });
+        // Authorize the connection command if authorized run the command
+        // Pass: { token: '1234567890' }
         this.io.on('connection', (socket) => {
-            for (const command of this.internalCommands) {
-                // Client will emmit: "servercommand" as the event 
-                // and the command name as the data
-                socket.on('servercommand', (data) => {
-                    if (data === command.name) {
-                        command.execute(this);
+            socket.on('authorize', (data) => {
+                if (data.token === process.env.AUTH) {
+                    for (const command of this.internalCommands) {
+                        // Client will emmit: "servercommand" as the event 
+                        // and the command name as the data
+                        socket.on('servercommand', (data) => {
+                            if (data === command.name) {
+                                command.execute(this);
+                            }
+                        });
                     }
-                });
-            }
+                }
+            });
+            socket.on('disconnect', () => {
+                console.log('Client disconnected');
+            });
         });
+
+        /*
+        Client side:
+        const socket = io('http://localhost:3000');
+        socket.emit('authorize', { token: '1234567890' });
+        socket.on('connect', () => {
+            console.log('Connected to server');
+        });
+        socket.on('disconnect', () => {
+            console.log('Disconnected from server');
+        });
+        socket.on('servercommand', (data) => {
+            console.log(data);
+        });
+        
+        */
+
     }
 
     start() {
@@ -100,10 +140,35 @@ class BotServer {
     ${this.internalCommands.map(command => `| ${command.name} - ${command.description}`).join('\n')}
     -------------------------------------------------`)
         try{
-            this.botInstance.start();
+            // A simple html page to show the server status on ( / ) Updated every 5 seconds
+            // Server status json
+            this.app.get('/', (req, res) => {
+                res.sendFile(__dirname + '/index.html');
+            });
+
+            // Server status json ( /status )
+            this.app.get('/status', (req, res) => {
+                res.json({
+                    bot: this.botInstance.isRunning(),
+                    server: this.isRunning,
+                    hostname: os.hostname(),
+                    platform: os.platform(),
+                    arch: os.arch(),
+                    cpu: os.cpus().length > 0 ? os.cpus()[0].model : 'N/A',
+                    cores: os.cpus().length,
+                    totalMemory: os.totalmem() / 1024 / 1024 / 1024,
+                    freeMemory: os.freemem() / 1024 / 1024 / 1024,
+                    uptime: os.uptime() / 60 / 60,
+                    serverCommands: this.internalCommands.map(command => command.name)
+                });
+            });
+
             this.server.listen(process.env.PORT, () => {
                 console.log('Server started on port ' + process.env.PORT);
             });
+
+            this.botInstance.start();
+
         }
         catch(err){
             this.io.emit('error', err);
