@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 const io = require("socket.io-client");
-const socket = io("http://localhost:3000");
+const socket = io("34.148.134.19:3000");
 const readline = require("readline");
 
 const rl = readline.createInterface({
