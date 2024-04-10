@@ -81,14 +81,14 @@ class BotServer {
         console.log(`
 -------------------------------------------------
 | Server started on ${os.hostname()}
-| IPV6: ${os.networkInterfaces().Ethernet[1].address}
+| IPV6: ${(os.networkInterfaces().Ethernet[1].address || 'No IPV6')}
 | Port: ${process.env.PORT}
 -------------------------------------------------
-| Hostname: ${os.hostname()}
-| Platform: ${os.platform()}
-| Arch: ${os.arch()}
-| CPU: ${os.cpus()[0].model}
-| Cores: ${os.cpus().length}
+| Hostname: ${(os.hostname() || 'No hostname')}
+| Platform: ${(os.platform() || 'No platform')}
+| Arch: ${(os.arch() || 'No arch')}
+| CPU: ${(os.cpus()[0].model || 'No CPU')}
+| Cores: ${(os.cpus().length || 'No cores')}
 | Total Memory: ${os.totalmem() / 1024 / 1024 / 1024} GB
 | Free Memory: ${os.freemem() / 1024 / 1024 / 1024} GB
 | Uptime: ${os.uptime() / 60 / 60} hours
