@@ -79,26 +79,26 @@ class BotServer {
         const os = require('os');
         this.isRunning = true;
         console.log(`
--------------------------------------------------
-| Server started on ${os.hostname()}
-| IPV6: ${(os.networkInterfaces().Ethernet[1].address || 'No IPV6')}
-| Port: ${process.env.PORT}
--------------------------------------------------
-| Hostname: ${(os.hostname() || 'No hostname')}
-| Platform: ${(os.platform() || 'No platform')}
-| Arch: ${(os.arch() || 'No arch')}
-| CPU: ${(os.cpus()[0].model || 'No CPU')}
-| Cores: ${(os.cpus().length || 'No cores')}
-| Total Memory: ${os.totalmem() / 1024 / 1024 / 1024} GB
-| Free Memory: ${os.freemem() / 1024 / 1024 / 1024} GB
-| Uptime: ${os.uptime() / 60 / 60} hours
--------------------------------------------------
-| Bot Status: ${this.botInstance.isRunning() ? 'Running' : 'Stopped'}
-| Server Status: ${this.isRunning ? 'Running' : 'Stopped'}
--------------------------------------------------
-| Server commands:
-${this.internalCommands.map(command => `| ${command.name} - ${command.description}`).join('\n')}
--------------------------------------------------`)
+    -------------------------------------------------
+    | Server started on ${os.hostname()}
+    | IPV6: ${(os.networkInterfaces().Ethernet && os.networkInterfaces().Ethernet[1] ? os.networkInterfaces().Ethernet[1].address : 'N/A')}
+    | Port: ${process.env.PORT}
+    -------------------------------------------------
+    | Hostname: ${os.hostname()}
+    | Platform: ${os.platform()}
+    | Arch: ${os.arch()}
+    | CPU: ${os.cpus().length > 0 ? os.cpus()[0].model : 'N/A'}
+    | Cores: ${os.cpus().length}
+    | Total Memory: ${os.totalmem() / 1024 / 1024 / 1024} GB
+    | Free Memory: ${os.freemem() / 1024 / 1024 / 1024} GB
+    | Uptime: ${os.uptime() / 60 / 60} hours
+    -------------------------------------------------
+    | Bot Status: ${this.botInstance.isRunning() ? 'Running' : 'Stopped'}
+    | Server Status: ${this.isRunning ? 'Running' : 'Stopped'}
+    -------------------------------------------------
+    | Server commands:
+    ${this.internalCommands.map(command => `| ${command.name} - ${command.description}`).join('\n')}
+    -------------------------------------------------`)
         try{
             this.botInstance.start();
             this.server.listen(process.env.PORT, () => {
