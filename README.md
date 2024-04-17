@@ -1,4 +1,4 @@
-# mpdb
+# MPDB (Multi.Purpose.Discord.Bot)
 mpdb - código aberto.Multi.Purpose.Discord.Bot
 O MPDB é uma base modular e robusta de código aberto para bots do Discord em JavaScript, utilizando o ápice do Clean Code, S.O.L.I.D e Design Patterns.
 
