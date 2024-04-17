@@ -5,7 +5,6 @@ O MPDB é uma base modular e robusta de código aberto para bots do Discord em J
 ## Estrutura do Projeto
 
 ```
-F:.
 │   .env
 │   .gitignore
 │   index.js
